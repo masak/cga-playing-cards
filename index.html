@@ -1,0 +1,94 @@
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Playing cards</title>
+    <style>
+      body {
+        background: black;
+      }
+    </style>
+  </head>
+  <body>
+    <img id="canvas">
+  </body>
+
+  <script src="picture-api.js"></script>
+  <script>
+    function degreesToRadians(d) {
+        return d * Math.atan2(1, 1) / 45;
+    }
+    const cos = Math.cos;
+    const sin = Math.sin;
+
+    drawPicture(() => {
+        for (let y = 0; y < 200; y++) {
+            for (let x = 0; x < 320; x++) {
+                let color = x % 2 && y % 2 && (x/2 + y/2) % 2
+                    ? cyan
+                    : black;
+                setPixel(x, y, color);
+            }
+        }
+
+        let centerX = 160;
+        let centerY = 100;
+        let width = 20;
+        let height = 35;
+        let angle = degreesToRadians(10);
+        let cornerRadius = 5;
+
+        for (let y = 0; y < 200; y++) {
+            for (let x = 0; x < 320; x++) {
+                let transX = x - centerX;
+                let transY = y - centerY;
+                let rotX = transX * cos(angle) - transY * sin(angle);
+                let rotY = transX * sin(angle) + transY * cos(angle);
+
+                let inCard =
+                    -width <= rotX && rotX <= width &&
+                    -height <= rotY && rotY <= height;
+
+                let inRightCorner =
+                    width - cornerRadius <= rotX && rotX <= width;
+                let inLeftCorner =
+                    -width <= rotX && rotX <= -width + cornerRadius;
+                let inUpperCorner =
+                    -height <= rotY && rotY <= -height + cornerRadius;
+                let inLowerCorner =
+                    height - cornerRadius <= rotY && rotY <= height;
+                let inCorner = (inRightCorner || inLeftCorner) &&
+                    (inUpperCorner || inLowerCorner);
+
+                let upperRightCornerDistance = Math.hypot(
+                    rotX - (width - cornerRadius),
+                    rotY - (-height + cornerRadius),
+                );
+                let upperLeftCornerDistance = Math.hypot(
+                    rotX - (-width + cornerRadius),
+                    rotY - (-height + cornerRadius),
+                );
+                let lowerRightCornerDistance = Math.hypot(
+                    rotX - (width - cornerRadius),
+                    rotY - (height - cornerRadius),
+                );
+                let lowerLeftCornerDistance = Math.hypot(
+                    rotX - (-width + cornerRadius),
+                    rotY - (height - cornerRadius),
+                );
+                let withinCornerDistance =
+                    Math.min(
+                        upperRightCornerDistance,
+                        upperLeftCornerDistance,
+                        lowerRightCornerDistance,
+                        lowerLeftCornerDistance,
+                    ) < cornerRadius;
+
+                if (inCard && (!inCorner || withinCornerDistance)) {
+                    setPixel(x, y, white);
+                }
+            }
+        }
+    });
+  </script>
+</html>
