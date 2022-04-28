@@ -87,6 +87,17 @@
             for (let y = 0; y < 200; y++) {
                 for (let x = 0; x < 320; x++) {
                     if (isCardPixel(x, y)) {
+                        setPixel(x-1, y, black);
+                        setPixel(x+1, y, black);
+                        setPixel(x, y-1, black);
+                        setPixel(x, y+1, black);
+                    }
+                }
+            }
+
+            for (let y = 0; y < 200; y++) {
+                for (let x = 0; x < 320; x++) {
+                    if (isCardPixel(x, y)) {
                         setPixel(x, y, white);
                     }
                 }
