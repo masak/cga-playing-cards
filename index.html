@@ -36,53 +36,57 @@
         let cornerRadius = 5;
 
         function drawCard(centerX, centerY, angle) {
+            function isCardPixel(x, y) {
+                let transX = x - centerX;
+                let transY = y - centerY;
+                let rotX = transX * cos(angle) - transY * sin(angle);
+                let rotY = transX * sin(angle) + transY * cos(angle);
+
+                let inCard =
+                    -width <= rotX && rotX <= width &&
+                    -height <= rotY && rotY <= height;
+
+                let inRightCorner =
+                    width - cornerRadius <= rotX && rotX <= width;
+                let inLeftCorner =
+                    -width <= rotX && rotX <= -width + cornerRadius;
+                let inUpperCorner =
+                    -height <= rotY && rotY <= -height + cornerRadius;
+                let inLowerCorner =
+                    height - cornerRadius <= rotY && rotY <= height;
+                let inCorner = (inRightCorner || inLeftCorner) &&
+                    (inUpperCorner || inLowerCorner);
+
+                let upperRightCornerDistance = Math.hypot(
+                    rotX - (width - cornerRadius),
+                    rotY - (-height + cornerRadius),
+                );
+                let upperLeftCornerDistance = Math.hypot(
+                    rotX - (-width + cornerRadius),
+                    rotY - (-height + cornerRadius),
+                );
+                let lowerRightCornerDistance = Math.hypot(
+                    rotX - (width - cornerRadius),
+                    rotY - (height - cornerRadius),
+                );
+                let lowerLeftCornerDistance = Math.hypot(
+                    rotX - (-width + cornerRadius),
+                    rotY - (height - cornerRadius),
+                );
+                let withinCornerDistance =
+                    Math.min(
+                        upperRightCornerDistance,
+                        upperLeftCornerDistance,
+                        lowerRightCornerDistance,
+                        lowerLeftCornerDistance,
+                    ) < cornerRadius;
+
+                return inCard && (!inCorner || withinCornerDistance);
+            }
+
             for (let y = 0; y < 200; y++) {
                 for (let x = 0; x < 320; x++) {
-                    let transX = x - centerX;
-                    let transY = y - centerY;
-                    let rotX = transX * cos(angle) - transY * sin(angle);
-                    let rotY = transX * sin(angle) + transY * cos(angle);
-
-                    let inCard =
-                        -width <= rotX && rotX <= width &&
-                        -height <= rotY && rotY <= height;
-
-                    let inRightCorner =
-                        width - cornerRadius <= rotX && rotX <= width;
-                    let inLeftCorner =
-                        -width <= rotX && rotX <= -width + cornerRadius;
-                    let inUpperCorner =
-                        -height <= rotY && rotY <= -height + cornerRadius;
-                    let inLowerCorner =
-                        height - cornerRadius <= rotY && rotY <= height;
-                    let inCorner = (inRightCorner || inLeftCorner) &&
-                        (inUpperCorner || inLowerCorner);
-
-                    let upperRightCornerDistance = Math.hypot(
-                        rotX - (width - cornerRadius),
-                        rotY - (-height + cornerRadius),
-                    );
-                    let upperLeftCornerDistance = Math.hypot(
-                        rotX - (-width + cornerRadius),
-                        rotY - (-height + cornerRadius),
-                    );
-                    let lowerRightCornerDistance = Math.hypot(
-                        rotX - (width - cornerRadius),
-                        rotY - (height - cornerRadius),
-                    );
-                    let lowerLeftCornerDistance = Math.hypot(
-                        rotX - (-width + cornerRadius),
-                        rotY - (height - cornerRadius),
-                    );
-                    let withinCornerDistance =
-                        Math.min(
-                            upperRightCornerDistance,
-                            upperLeftCornerDistance,
-                            lowerRightCornerDistance,
-                            lowerLeftCornerDistance,
-                        ) < cornerRadius;
-
-                    if (inCard && (!inCorner || withinCornerDistance)) {
+                    if (isCardPixel(x, y)) {
                         setPixel(x, y, white);
                     }
                 }
